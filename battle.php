@@ -1,9 +1,10 @@
 <?php
 require __DIR__.'/functions.php';
 
-$pdo = new PDO($configuration['dbDns'], $configuration['dbUser'], $configuration['dbPassword']);
+$container = new Container($configuration);
+$pdo = $container->getPDO();
 
-$shipLoader = new ShipLoader($pdo);
+$shipLoader = $container->getShipLoader();
 $ships = $shipLoader->getShips();
 
 $ship1Id = isset($_POST['ship1_id']) ? $_POST['ship1_id'] : null;
@@ -29,7 +30,7 @@ if ($ship1Quantity <= 0 || $ship2Quantity <= 0) {
     die;
 }
 
-$battleManager = new BattleManager();
+$battleManager = $container->getBattleManager();
 $battleResult = $battleManager->battle($ship1, $ship1Quantity, $ship2, $ship2Quantity);
 ?>
 
@@ -77,7 +78,7 @@ $battleResult = $battleManager->battle($ship1, $ship1Quantity, $ship2, $ship2Qua
                     <?php endif; ?>
                 </h3>
                 <p class="text-center">
-                    <?php if (!$battleResult->isThereAWinner() == null): ?>
+                    <?php if ($battleResult->isThereAWinner() == null): ?>
                         Both ships destroyed each other in an epic battle to the end.
                     <?php else: ?>
                         The <?php echo $battleResult->getWinningShip()->getName(); ?>

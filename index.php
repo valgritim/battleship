@@ -1,9 +1,10 @@
 <?php
 require __DIR__.'/functions.php';
 
-$pdo = new PDO($configuration['dbDns'], $configuration['dbUser'], $configuration['dbPassword']);
+$container = new Container($configuration);
+$pdo = $container->getPDO();
 
-$shipLoader = new ShipLoader($pdo);
+$shipLoader = $container->getShipLoader();
 $ships = $shipLoader->getShips();
 //var_dump($ships); die;
 
@@ -26,11 +27,12 @@ if (isset($_GET['error'])) {
 ?>
 
 <html>
+    
     <head>
         <meta charset="utf-8">
            <meta http-equiv="X-UA-Compatible" content="IE=edge">
            <meta name="viewport" content="width=device-width, initial-scale=1">
-           <title>OO Battleships</title>
+           <title>Battleships</title>
 
            <!-- Bootstrap -->
            <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -54,7 +56,7 @@ if (isset($_GET['error'])) {
     <body>
         <div class="container">
             <div class="page-header">
-                <h1>OO Battleships of Space</h1>
+                <h1>Battleships of Space</h1>
             </div>
             <table class="table table-hover">
                 <caption><i class="fa fa-rocket"></i> These ships are ready for their next Mission</caption>
