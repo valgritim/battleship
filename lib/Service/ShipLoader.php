@@ -4,20 +4,20 @@ require_once 'functions.php';
 //Service
 class ShipLoader {
 
-    private $pdo;
+    private $shipsStorage;
 
-    public function __construct($pdo)
+    public function __construct(ShipStorageInterface $shipsStorage)
     {
-        $this->pdo = $pdo;
+        $this->shipsStorage = $shipsStorage;
 
     }
     /**
-     * @return Ship[]
+     * @return AbstractShip[]
      *
      */
     public function getShips()
     {
-        $shipsData = $this->queryForShips();
+        $shipsData = $this->shipsStorage->fetchAllShipsData();
 
         $ships = array();
         foreach($shipsData as $shipData){
@@ -43,42 +43,23 @@ class ShipLoader {
 
     /**
      * @param $id
-     * @return Ship|null
+     * @return AbstractShip|null
      */
     public function findOneById($id){
-
-        $pdo = $this->getPDO();
-        $statement = $pdo->prepare('SELECT * FROM ship WHERE id=:id');
-        $statement->execute(array('id' => $id));
-        $shipArray = $statement->fetch(PDO::FETCH_ASSOC);
-       
-        if(!$shipArray){
-            return null;
-        }
+        $shipArray = $this->shipsStorage->fetchSingleShipData($id);
         return $this->createShipFromData($shipArray);
     }
 
     private function createShipFromData(array $shipData){
-        $ship = new Ship($shipData['id'],$shipData['name'],$shipData['weapon_power'],$shipData['jedi_factor'], $shipData['strength'], $shipData['is_under_repair']);
+        if($shipData['team'] === 'rebel'){
+            $ship = new RebelShip($shipData['id'],$shipData['name'],$shipData['weapon_power'],$shipData['jedi_factor'], $shipData['strength'], $shipData['team'],$shipData['is_under_repair']);
+        } else {
+
+            $ship = new Ship($shipData['id'],$shipData['name'],$shipData['weapon_power'],$shipData['jedi_factor'], $shipData['strength'], $shipData['team'],$shipData['is_under_repair']);
+        }
         return $ship;
     }
 
-    private function queryForShips(){
 
-        $pdo = $this->getPDO();
-        
-        $statement = $pdo->prepare('SELECT * FROM ship');
-        $statement->execute();
-        $ships = $statement->fetchAll(PDO::FETCH_ASSOC);
-        return $ships;
-    }
-    /**
-     * 
-     *
-     * @return PDO
-     */
-    private function getPDO(){
-        
-        return $this->pdo;
-    }
+
 }

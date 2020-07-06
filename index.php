@@ -7,7 +7,8 @@ $pdo = $container->getPDO();
 $shipLoader = $container->getShipLoader();
 $ships = $shipLoader->getShips();
 //var_dump($ships); die;
-
+$broken = new BrokenShip(7,"X-wings",0,0,"Broken");
+$ships[] = $broken;
 $errorMessage = '';
 if (isset($_GET['error'])) {
     switch ($_GET['error']) {
@@ -66,6 +67,7 @@ if (isset($_GET['error'])) {
                         <th>Weapon Power</th>
                         <th>Jedi Factor</th>
                         <th>Strength</th>
+                        <th>Team</th>
                         <th>Status</th>
                     </tr>
                 </thead>
@@ -76,8 +78,9 @@ if (isset($_GET['error'])) {
                             <td><?php echo $ship->getWeaponPower(); ?></td>
                             <td><?php echo $ship->getJediFactor(); ?></td>
                             <td><?php echo $ship->getStrength(); ?></td>
+                            <td><?php echo ucFirst($ship->getTeam()); ?></td>
                             <td>
-                                <?php  if($ship->isFunctionnal()): ?>
+                                <?php  if($ship->isFunctional()): ?>
                                     <i class="fa fa-sun-o"></i>
                                 <?php else: ?>
                                     <i class="fa fa-cloud"></i>
@@ -96,7 +99,7 @@ if (isset($_GET['error'])) {
                         <select class="center-block form-control btn drp-dwn-width btn-default dropdown-toggle" name="ship1_id">
                             <option value="">Choose a Ship</option>
                             <?php foreach ($ships as $ship): ?>
-                            <?php if($ship->isFunctionnal()): ?>
+                            <?php if($ship->isFunctional()): ?>
                                 <option value="<?php echo $ship->getId(); ?>"><?php echo $ship->getNameAndSpecs(false); ?></option>
                             <?php endif; ?>
                             <?php endforeach; ?>
@@ -108,7 +111,7 @@ if (isset($_GET['error'])) {
                         <select class="center-block form-control btn drp-dwn-width btn-default dropdown-toggle" name="ship2_id">
                             <option value="">Choose a Ship</option>
                             <?php foreach ($ships as $ship): ?>
-                                <?php if($ship->isFunctionnal()): ?>
+                                <?php if($ship->isFunctional()): ?>
                                     <option value="<?php echo $ship->getId(); ?>"><?php echo $ship->getNameAndSpecs(false); ?></option>
                                 <?php endif; ?>
                             <?php endforeach; ?>

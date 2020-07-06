@@ -3,12 +3,12 @@
 //Service
 class BattleManager {
 
-        /**
-     * Our complex fighting algorithm!
+    /**
+     * fighting algorithm
      *
      * @return BattleResult With keys winning_ship, losing_ship & used_jedi_powers
      */
-    public function battle(Ship $ship1, $ship1Quantity, Ship $ship2, $ship2Quantity)
+    public function battle(AbstractShip $ship1, $ship1Quantity, AbstractShip $ship2, $ship2Quantity)
     {
         $ship1Health = $ship1->getStrength() * $ship1Quantity;
         $ship2Health = $ship2->getStrength() * $ship2Quantity;
@@ -57,7 +57,7 @@ class BattleManager {
         
     }
 
-    private function didJediDestroyShipUsingTheForce(Ship $ship){
+    private function didJediDestroyShipUsingTheForce(AbstractShip $ship){
         $jediHeroProbability = $ship->getJediFactor() / 100;
 
         return mt_rand(1, 100) <= ($jediHeroProbability*100);
