@@ -1,8 +1,12 @@
 <?php
 require __DIR__.'/functions.php';
 
+
+use Service\Container;
+
+
 $container = new Container($configuration);
-$pdo = $container->getPDO();
+
 
 $shipLoader = $container->getShipLoader();
 $ships = $shipLoader->getShips();
@@ -31,7 +35,8 @@ if ($ship1Quantity <= 0 || $ship2Quantity <= 0) {
 }
 
 $battleManager = $container->getBattleManager();
-$battleResult = $battleManager->battle($ship1, $ship1Quantity, $ship2, $ship2Quantity);
+$battleType = $_POST['battle_type'];
+$battleResult = $battleManager->battle($ship1, $ship1Quantity, $ship2, $ship2Quantity, $battleType);
 ?>
 
 <html>

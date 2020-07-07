@@ -1,4 +1,5 @@
 <?php 
+namespace Model;
 
 class RebelShip extends AbstractShip {
 

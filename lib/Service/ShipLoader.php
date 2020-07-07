@@ -1,5 +1,8 @@
 <?php
-require_once 'functions.php';
+namespace Service;
+use Model\RebelShip;
+use Model\Ship;
+use Model\AbstractShip;
 
 //Service
 class ShipLoader {
@@ -17,35 +20,23 @@ class ShipLoader {
      */
     public function getShips()
     {
-        $shipsData = $this->shipsStorage->fetchAllShipsData();
-
         $ships = array();
-        foreach($shipsData as $shipData){
 
-            $ship = $this->createShipFromData($shipData);
-            $ships[]=$ship;
+        $shipsData = $this->queryForShips();
+
+        foreach ($shipsData as $shipData) {
+            $ships[] = $this->createShipFromData($shipData);
         }
-        // $ships = array();
-        // $ship = new Ship('Jedi Starfighter',5,15,30);
-        // $ship1 = new Ship('CloakShape Fighter',2,2,70);
-        // $ship2 = new Ship('Super Star Destroyer',70,0,500);
-        // $ship3 = new Ship('RZ-1 A-wing interceptor',4,4,50);
 
-
-        // $ships['starfighter'] = $ship;
-        // $ships['cloakshape_fighter'] = $ship1;
-        // $ships['super_star_destroyer'] = $ship2;
-        // $ships['rz1_a_wing_interceptor'] = $ship3;
-
-        return $ships;       
-
+        return $ships;
     }
 
     /**
      * @param $id
-     * @return AbstractShip|null
+     * @return AbstractShip
      */
     public function findOneById($id){
+        
         $shipArray = $this->shipsStorage->fetchSingleShipData($id);
         return $this->createShipFromData($shipArray);
     }
@@ -59,7 +50,9 @@ class ShipLoader {
         }
         return $ship;
     }
-
-
+    private function queryForShips()
+    {
+        return $this->shipsStorage->fetchAllShipsData();
+    }
 
 }

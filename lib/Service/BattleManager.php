@@ -1,42 +1,61 @@
 <?php
 
-//Service
-class BattleManager {
+namespace Service;
 
+use Model\BattleResult;
+use Model\AbstractShip;
+
+class BattleManager
+{
+    // Normal battle mode
+    const TYPE_NORMAL= 'normal';
+    // Fighting without jedi powers
+    const TYPE_NO_JEDI = 'no_jedi';
+    // Fighting only with jedi powers
+    const TYPE_ONLY_JEDI = 'only_jedi';
     /**
-     * fighting algorithm
+     * Our complex fighting algorithm!
      *
-     * @return BattleResult With keys winning_ship, losing_ship & used_jedi_powers
+     * @return BattleResult
      */
-    public function battle(AbstractShip $ship1, $ship1Quantity, AbstractShip $ship2, $ship2Quantity)
+    public function battle(AbstractShip $ship1, $ship1Quantity, AbstractShip $ship2, $ship2Quantity, $battleType)
     {
         $ship1Health = $ship1->getStrength() * $ship1Quantity;
         $ship2Health = $ship2->getStrength() * $ship2Quantity;
 
         $ship1UsedJediPowers = false;
         $ship2UsedJediPowers = false;
+        $i = 0;
         while ($ship1Health > 0 && $ship2Health > 0) {
             // first, see if we have a rare Jedi hero event!
-            if ($this->didJediDestroyShipUsingTheForce($ship1)) {
+            if ($battleType != self::TYPE_NO_JEDI && $this->didJediDestroyShipUsingTheForce($ship1)) {
                 $ship2Health = 0;
                 $ship1UsedJediPowers = true;
 
                 break;
             }
-            if ($this->didJediDestroyShipUsingTheForce($ship2)) {
+            if ($battleType != self::TYPE_NO_JEDI && $this->didJediDestroyShipUsingTheForce($ship2)) {
                 $ship1Health = 0;
                 $ship2UsedJediPowers = true;
 
                 break;
             }
 
-            // now battle them normally
-            $ship1Health = $ship1Health - ($ship2->getWeaponPower() * $ship2Quantity);
-            $ship2Health = $ship2Health - ($ship1->getWeaponPower() * $ship1Quantity);
+            if($battleType != self::TYPE_ONLY_JEDI){
+                // now battle them normally
+                $ship1Health = $ship1Health - ($ship2->getWeaponPower() * $ship2Quantity);
+                $ship2Health = $ship2Health - ($ship1->getWeaponPower() * $ship1Quantity);
+            }
+            if($i == 100){
+                $ship1Health = 0;
+                $ship2Health = 0;
+            }
+            $i++;
         }
 
+        // update the strengths on the ships, so we can show this
         $ship1->setStrength($ship1Health);
-        $ship2->setStrength($ship2Health);        
+        $ship2->setStrength($ship2Health);
 
         if ($ship1Health <= 0 && $ship2Health <= 0) {
             // they destroyed each other
@@ -53,11 +72,20 @@ class BattleManager {
             $usedJediPowers = $ship1UsedJediPowers;
         }
 
-        return new BattleResult($winningShip,$losingShip,$usedJediPowers);
-        
+        return new BattleResult($winningShip, $losingShip, $usedJediPowers);
     }
 
-    private function didJediDestroyShipUsingTheForce(AbstractShip $ship){
+    public static function getAllBattleTypesWithDescription()
+    {
+        return array(
+            self::TYPE_NORMAL => 'Normal',
+            self::TYPE_NO_JEDI => 'No jedi Powers',
+            self::TYPE_ONLY_JEDI => 'Only Jedi Powers',
+        );
+    }
+
+    private function didJediDestroyShipUsingTheForce(AbstractShip $ship)
+    {
         $jediHeroProbability = $ship->getJediFactor() / 100;
 
         return mt_rand(1, 100) <= ($jediHeroProbability*100);

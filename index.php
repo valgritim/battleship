@@ -1,6 +1,11 @@
 <?php
 require __DIR__.'/functions.php';
 
+use Service\BattleManager;
+use Service\Container;
+use Model\BrokenShip;
+
+
 $container = new Container($configuration);
 $pdo = $container->getPDO();
 
@@ -9,6 +14,9 @@ $ships = $shipLoader->getShips();
 //var_dump($ships); die;
 $broken = new BrokenShip(7,"X-wings",0,0,"Broken");
 $ships[] = $broken;
+
+$battleTypes =BattleManager::getAllBattleTypesWithDescription();
+
 $errorMessage = '';
 if (isset($_GET['error'])) {
     switch ($_GET['error']) {
@@ -116,6 +124,15 @@ if (isset($_GET['error'])) {
                                 <?php endif; ?>
                             <?php endforeach; ?>
                         </select>
+                        <br>
+                        <div class="text-center">
+                            <label for="battle_type">Battle type</label>
+                            <select name="battle_type" id="battle_type" class="center-block form-control drp-dwn-width btn-default dropdown-toggle">
+                                <?php foreach($battleTypes as $battleType => $typeText) : ?>
+                                    <option value="<?php echo $battleType; ?>"><?php echo $typeText; ?></option>
+                                <?php endforeach ?>
+                            </select>
+                        </div>
                         <br>
                         <button class="btn btn-md btn-danger center-block" type="submit">Engage</button>
                     </form>
