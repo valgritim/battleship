@@ -3,6 +3,7 @@ namespace Service;
 use Model\RebelShip;
 use Model\Ship;
 use Model\AbstractShip;
+use Model\BountyHunterShip;
 
 //Service
 class ShipLoader {
@@ -20,13 +21,23 @@ class ShipLoader {
      */
     public function getShips()
     {
+        
+        try{
+
+            $shipsData = $this->queryForShips();
+
+        } catch(\PDOException $e){
+           
+            trigger_error('Database Exception!' . $e->getMessage());
+            $shipsData = []; 
+        }
         $ships = array();
-
-        $shipsData = $this->queryForShips();
-
         foreach ($shipsData as $shipData) {
             $ships[] = $this->createShipFromData($shipData);
         }
+
+        //Boba Fett's ship
+        $ships[] = new BountyHunterShip(8, "Slave I", 0, 0, "Bounty Hunter");
 
         return $ships;
     }
